@@ -33,6 +33,11 @@ def convert_to_binary_string(in_str):
     return fb_.replace("F","0").replace("B","1"),  lr_.replace("R","1").replace("L","0")
 
 def seat_id(fb_, lr_):
+    """
+    :param fb_: F/B value
+    :param lr_: L/R value
+    :return: Returns FB*8 + LR
+    """
     return fb_*8 + lr_
 
 # Part 1: What is the highest seat ID?
