@@ -6,54 +6,32 @@ Group answers are separated by blanks
 """
 
 f = open("input_20201206.txt", "r")
-
-answers = list()
-
-for line in f.readlines():
-    answers.append(line.strip("\n"))
-
+in_data = f.read()
 f.close()
 
-# Part 1: Count the sum of unique answers given by each group
-unique_answers = 0
-answer_set = set()
+groups = in_data.split("\n\n")
+answer_length = 0
 
-for a in answers:
-    if len(a) > 0:
-        answer_set.update(a)
-    else:
-        unique_answers+=len(answer_set)
-        answer_set = set()
+# Part 1: Find the unique number of letters per group
+for group in groups:
+    unique_answers = set()
 
-# Final item
-unique_answers+=len(answer_set)
-#print(unique_answers)
+    for person in group.split("\n"):
+        unique_answers |= set(person)
 
-# Part 2: Count the sum where everyone answered the same
-# So, same as before, but with set intersections?
-answer_set = set()
-shared_answers = 0
-group_answers = list()
-first = True
+    answer_length+=len(unique_answers)
 
-for a in answers:
-    print(a)
+print(answer_length)
 
-    if first:
-        # First person in a group
-        # Update the set with whatever this element is
-        answer_set.update(a)
-        first = False
-    elif a=="":
-        # If it's a new line, we're on a new group
-        # Reset the indicator variable and add the number of shared answers
-        first = True
-        shared_answers+=len(answer_set)
-        print(len(answer_set), shared_answers)
-        answer_set = set()
-    else:
-        # Otherwise intersect the elements within our set
-        answer_set = answer_set & set(a)
+answer_length = 0
 
-shared_answers+=len(answer_set)
-print(shared_answers)
+# Part 2: Find the shared number of letters per group
+for group in groups:
+    shared_answers = set("abcdefghijklmnopqrstuvwxyz")
+
+    for person in group.split("\n"):
+        shared_answers &= set(person)
+
+    answer_length+=len(shared_answers)
+
+print(answer_length)
