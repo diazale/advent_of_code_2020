@@ -102,14 +102,28 @@ for rule in bag_rules:
         colour_rules[rule_colour(rule)] = [parse_subrule(subrule) for subrule in parse_rule(rule)]
 
 def count_bags(colour_rules_):
+    """
+    Recursive function to count all bags contained within a bag.
+
+    If the bag contains no other bags, the colour_rules_ list will be length 0
+    This is the base case and returns 1 bag
+    If it contains bags, the list has length > 0
+    This is the recursive case, so we find out how many bags that bag contains, and multiply
+    by the number of those bags
+
+    :param colour_rules_: A list of tuples containing all bag colours and quantities of bags for a given colour
+    :eg: {"light beige": [("dim purple", 4), ("posh red", 1), ("clear aqua", 4), ("striped coral", 1)]}
+    :return: Number of bags contained within a bag
+    """
     sumval = 1
 
     if len(colour_rules) > 0:
+        # e.g. a bag contains 3 blue and 6 red
+        # so return 3*count_bags(blue) + 6*count_bags(red)
         for subrule_ in colour_rules_:
             sumval += subrule_[1] * count_bags(colour_rules[subrule_[0]])
     return sumval
 
-count = 0
 # Starting with the rule for shiny gold bags, count all the bags
 c = "shiny gold"
 print(count_bags(colour_rules[c]) - 1)
