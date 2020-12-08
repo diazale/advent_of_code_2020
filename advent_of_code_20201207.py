@@ -14,6 +14,8 @@ faded blue bags contain no other bags.
 dotted black bags contain no other bags.
 """
 
+from collections import defaultdict
+
 f = open("input_20201207.txt", "r")
 in_data = f.read()
 f.close()
@@ -57,20 +59,57 @@ in_data = f.read()
 f.close()
 
 bag_rules = in_data.split("\n")
-bag_count = 0
 
-core_rules = list()
-core_rules_multiplier = list()
-core_rules.append("shiny gold")
-core_rules_multiplier.append(1)
+def parse_rule(in_str):
+    # Rules are written as:
+    # 1 rule: "[colour] bags contain [N] [other colour] bags
+    # 2+ rule: "[colour bags contain [N1] [colour bags], [N2] [other colour bags], ... [Nk] [last colour bags]"
+    # Get rid of "contain " at the start
+    # Get rid of period at the end
+    temp_str = in_str.split(",")
+    temp_str[0] = (temp_str[0].split(" contain "))[1]
+    temp_str = [t.strip(" .") for t in temp_str]
+    return temp_str
 
-# Two types of rules: plural and singular
-# "shiny gold bags contain 1 shiny coral bag, 5 posh white bags, 3 wavy cyan bags."
-# "dim yellow bags contain 3 striped white bags."
+def rule_colour(in_str):
+    return in_str.split(" bags contain")[0].strip()
 
-# Identify the first set of rules and build out from there?
-for core_rule in core_rules:
-    for rule in bag_rules:
-        if rule[:len(core_rule)]==core_rule:
-            # Sub-rules are identified by the word "contain" or "contains"
-            print(rule)
+def parse_subrule(in_str):
+    # Two cases:
+    # [Colour] bags contain no other bags.
+    # Or each element is [N] [colour] [bag(s)]
+    # Returns a tuple of colour and number
+    if "no other bags" in in_str:
+        # Base case
+        num = 0
+        col = in_str.split(" bags contain no other bags")[0]
+    else:
+        # Recursive case: Return
+        num = int(in_str.split()[0].strip(" "))
+        col = " ".join(in_str.split()[1:-1])
+    return col, num
+
+colour_rules = defaultdict()
+
+for rule in bag_rules:
+    if "no other bags" in rule:
+        # If there are no other bags, this rule has nothing associated with it
+        # {"dull chartreuse":[]}
+        colour_rules[rule_colour(rule)] = []
+    else:
+        # If there are rules associated with this, list them
+        # {"light beige": [("dim purple", 4), ("posh red", 1), ("clear aqua", 4), ("striped coral", 1)]}
+        colour_rules[rule_colour(rule)] = [parse_subrule(subrule) for subrule in parse_rule(rule)]
+
+def count_bags(colour_rules_):
+    sumval = 1
+
+    if len(colour_rules) > 0:
+        for subrule_ in colour_rules_:
+            sumval += subrule_[1] * count_bags(colour_rules[subrule_[0]])
+    return sumval
+
+count = 0
+# Starting with the rule for shiny gold bags, count all the bags
+c = "shiny gold"
+print(count_bags(colour_rules[c]) - 1)
