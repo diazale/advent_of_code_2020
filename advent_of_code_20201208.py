@@ -21,8 +21,8 @@ def navigate_instructions(instructions_, position_, acc):
         if not position_ in visited_indices:
             visited_indices.append(position_)
             # Figure out what to do
-            instruction = parse_instruction(instructions_[position_])
-            #print(instruction)
+            parse_instruction(instructions_[position_])
+            instruction, increment = parse_instruction(instructions_[position_])
 
             if instruction[0]=="acc":
                 # Increase accumulator and move to next line
@@ -31,7 +31,7 @@ def navigate_instructions(instructions_, position_, acc):
                 navigate_instructions(instructions_, position_ + 1, acc)
             elif instruction[0]=="jmp":
                 # Jump ahead by the value
-                navigate_instructions(instructions_, position_ + instruction[1], acc)
+                navigate_instructions(instructions_, position_ + increment, acc)
             elif instruction[0]=="nop":
                 navigate_instructions(instructions_, position_+ 1, acc)
         else:
@@ -45,7 +45,6 @@ navigate_instructions(instructions, 0, 0)
 # Part 2: Switch jmp/nop pairs so that the list never enters an infinite loop
 # Strategy: Create a copy of the list
 # Then change each one and see the acc when we run out of instructions
-
 for i in range(0, len(instructions)):
     new_instructions = instructions.copy()
     visited_indices = []
